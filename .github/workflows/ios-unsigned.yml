@@ -1,0 +1,59 @@
+name: iOS unsigned ipa
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    # Newest macOS image; the step below picks the newest Xcode on it (iPhone Duo needs the iOS 27.1 SDK).
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      WRK_SIDELOAD: "1"
+      EXPO_NO_TELEMETRY: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Select the newest Xcode 27
+        run: |
+          ls -d /Applications/Xcode*
+          X=$(ls -d /Applications/Xcode_*.app 2>/dev/null | grep -v beta | sort -V | tail -1)
+          if [ -n "$X" ]; then sudo xcode-select -s "$X/Contents/Developer"; fi
+          xcodebuild -version
+          xcodebuild -showsdks | grep -i iphoneos
+      - name: Write .env from secrets
+        env:
+          SHOP_API_URL: ${{ secrets.EXPO_PUBLIC_SHOP_API_URL }}
+          SHOP_KEY: ${{ secrets.EXPO_PUBLIC_SHOP_KEY }}
+          MOYASAR_KEY: ${{ secrets.EXPO_PUBLIC_MOYASAR_PUBLISHABLE_KEY }}
+          SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+        run: |
+          {
+            echo "EXPO_PUBLIC_SHOP_API_URL=${SHOP_API_URL:-https://api.wrk.sa}"
+            echo "EXPO_PUBLIC_SHOP_KEY=${SHOP_KEY}"
+            echo "EXPO_PUBLIC_MOYASAR_PUBLISHABLE_KEY=${MOYASAR_KEY}"
+            echo "EXPO_PUBLIC_SUPABASE_URL=${SUPABASE_URL}"
+            echo "EXPO_PUBLIC_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}"
+          } > .env
+      - run: npm ci
+      - run: npx expo prebuild --platform ios
+      - name: Build (no code signing)
+        run: |
+          set -o pipefail
+          cd ios
+          WS=$(ls -d *.xcworkspace | head -1)
+          SCHEME="${WS%.xcworkspace}"
+          xcodebuild -workspace "$WS" -scheme "$SCHEME" -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" | tail -n 400
+      - name: Package ipa
+        run: |
+          APP=$(ls -d ios/build/Build/Products/Release-iphoneos/*.app | head -1)
+          mkdir -p out/Payload && cp -R "$APP" out/Payload/
+          cd out && zip -qry wrk-unsigned.ipa Payload && ls -la
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wrk-unsigned-ipa
+          path: out/wrk-unsigned.ipa

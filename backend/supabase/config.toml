@@ -1,0 +1,20 @@
+# Supabase CLI settings for the wrk. community backend.
+# Run `supabase link --project-ref <ref>` once; it does not need a project id here.
+
+[functions.auth-request-code]
+verify_jwt = false   # public: this is how people sign in
+
+[functions.auth-verify-code]
+verify_jwt = false   # public: this is how people sign in
+
+[functions.moderate]
+verify_jwt = false   # checks the member's token (or the cron secret) itself
+
+[functions.push]
+verify_jwt = false   # cron only: checks the cron secret itself
+
+[functions.auth-work-email]
+verify_jwt = false   # checks the member's token itself
+
+[functions.company-icons]
+verify_jwt = false   # cron secret or a moderator's token: checks both itself
