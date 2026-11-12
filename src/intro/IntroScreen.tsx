@@ -7,6 +7,7 @@
  * With Reduce Motion on, the badge changes state without travelling and the words simply swap.
  */
 import { useRouter } from 'expo-router';
+import { padX } from '@/layout/rtl';
 import * as React from 'react';
 import { Pressable, StyleSheet, View, useWindowDimensions } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
@@ -111,7 +112,7 @@ export function IntroScreen({ onDone }: IntroScreenProps) {
         testID="intro"
         accessible={false}
         onPress={next}
-        style={[styles.fill, { paddingTop: insets.top, paddingBottom: insets.bottom + space[5], paddingLeft: insets.left + gutter, paddingRight: insets.right + gutter }]}>
+        style={[styles.fill, { paddingTop: insets.top, paddingBottom: insets.bottom + space[5], ...padX(insets.left + gutter, insets.right + gutter) }]}>
         <View style={styles.top}>
           {beat < LAST ? <Button testID="intro-skip" label={intro.skip} variant="quiet" size="sm" onPress={skip} haptic={false} /> : null}
         </View>

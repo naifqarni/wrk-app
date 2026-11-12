@@ -4,6 +4,7 @@
  * so iOS 27 can move the buttons into the iPhone Duo rail and Android gets predictive back.
  */
 import * as React from 'react';
+import { padX } from '../layout/rtl';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { color, gutter, space } from '../theme';
@@ -41,7 +42,7 @@ export function Header({ title, onBack, backLabel = 'رجوع', cartCount, onPre
     <View
       style={[
         styles.wrap,
-        inset ? { paddingTop: insets.top, paddingLeft: insets.left + gutter, paddingRight: insets.right + gutter } : { paddingHorizontal: gutter },
+        inset ? { paddingTop: insets.top, ...padX(insets.left + gutter, insets.right + gutter) } : { paddingHorizontal: gutter },
         divider ? styles.divider : null,
         style,
       ]}>

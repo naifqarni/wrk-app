@@ -48,3 +48,21 @@ export function toArabicDigits(value: string | number): string {
 export function ltr(text: string): string {
   return `⁦${text}⁩`;
 }
+
+/**
+ * On iOS and Android, React Native swaps left and right styles in RTL (paddingLeft is drawn on the right).
+ * The web does not. System insets and the iPhone Duo rail are PHYSICAL sides, so every physical left/right
+ * style goes through these helpers. Without them, the rail padding landed on the wrong side on the device.
+ */
+const swaps = (): boolean =>
+  Platform.OS !== 'web' && I18nManager.isRTL && I18nManager.getConstants().doLeftAndRightSwapInRTL !== false;
+
+/** Padding on the physical left and right edges. */
+export function padX(left: number, right: number): { paddingLeft: number; paddingRight: number } {
+  return swaps() ? { paddingLeft: right, paddingRight: left } : { paddingLeft: left, paddingRight: right };
+}
+
+/** Absolute position from the physical left edge. */
+export function fromLeft(x: number): { left: number } | { right: number } {
+  return swaps() ? { right: x } : { left: x };
+}

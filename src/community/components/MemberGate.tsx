@@ -4,6 +4,7 @@
  * One object on paper (the badge, its name card still blank), set down once, dead centre.
  */
 import { useRouter } from 'expo-router';
+import { padX } from '@/layout/rtl';
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, KeyboardAvoidingView, Platform, ScrollView, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -132,8 +133,7 @@ export function MemberGate() {
           gap: sideBySide ? 56 : 30,
           paddingTop: insets.top + 24,
           paddingBottom: insets.bottom + 24,
-          paddingLeft: Math.max(insets.left, 28),
-          paddingRight: Math.max(insets.right, 28),
+          ...padX(Math.max(insets.left, 28), Math.max(insets.right, 28)),
         }}>
         {badge}
         {form}

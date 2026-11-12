@@ -8,6 +8,7 @@
  * - `footer` is pinned above the home indicator and the keyboard (the "add to cart" bar).
  */
 import * as React from 'react';
+import { padX } from '../layout/rtl';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View, type ScrollViewProps, type StyleProp, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { color, gutter, size, space } from '../theme';
@@ -55,8 +56,7 @@ export function Screen({
   React.useEffect(() => () => liftToast(0), [liftToast]);
   const pad = padded ? gutter : 0;
   const side: ViewStyle = {
-    paddingLeft: (edges.includes('left') ? insets.left : 0) + pad,
-    paddingRight: (edges.includes('right') ? insets.right : 0) + pad,
+    ...padX((edges.includes('left') ? insets.left : 0) + pad, (edges.includes('right') ? insets.right : 0) + pad),
   };
   const top = !header && edges.includes('top') ? insets.top : 0;
   const bottom = edges.includes('bottom') ? insets.bottom : 0;

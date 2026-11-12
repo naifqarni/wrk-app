@@ -10,6 +10,7 @@
  *   <Stack.Screen name="compose" options={sheetRoute} />   (see ./native-options)
  */
 import * as React from 'react';
+import { fromLeft } from '../layout/rtl';
 import { AccessibilityInfo, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { Gesture, GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import Animated, { Easing, runOnJS, useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
@@ -115,7 +116,7 @@ export function Sheet({ visible, onClose, title, children, footer, dismissable =
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
           pointerEvents="box-none"
           style={[
-            { position: 'absolute', left: area.left, top: area.top, width: area.width, height: area.height },
+            { position: 'absolute', ...fromLeft(area.left), top: area.top, width: area.width, height: area.height },
             centred ? styles.centre : styles.bottom,
           ]}>
           <Animated.View

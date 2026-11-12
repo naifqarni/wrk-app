@@ -4,6 +4,7 @@
  * Announced to VoiceOver / TalkBack. Wrap the app once in <ToastProvider>.
  */
 import * as React from 'react';
+import { padX } from '../layout/rtl';
 import { AccessibilityInfo, Pressable, StyleSheet, View } from 'react-native';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -76,7 +77,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
       {toast ? (
         <View
           pointerEvents="box-none"
-          style={[styles.host, { bottom: (lift > 0 ? lift : insets.bottom) + space[4], paddingLeft: insets.left + space[4], paddingRight: insets.right + space[4] }]}>
+          style={[styles.host, { bottom: (lift > 0 ? lift : insets.bottom) + space[4], ...padX(insets.left + space[4], insets.right + space[4]) }]}>
           <Animated.View style={[styles.pill, style]} accessibilityLiveRegion="polite">
             <Text variant="label" tone="onBlack" numberOfLines={2} style={styles.msg}>
               {toast.message}

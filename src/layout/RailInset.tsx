@@ -11,6 +11,7 @@
  * Sides are physical (left/right), never start/end.
  */
 import * as React from 'react';
+import { padX } from './rtl';
 import { View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
 import { useLayoutClass } from './useLayoutClass';
 
@@ -42,7 +43,7 @@ export function RailInset({ children, style }: { children: React.ReactNode; styl
   const padRight = Math.min(rail.right, Math.max(0, x + w - (windowWidth - rail.right)));
   return (
     <RailInsetContext.Provider value>
-      <View ref={ref} onLayout={measure} style={[{ flex: 1, paddingLeft: padLeft, paddingRight: padRight }, style]}>
+      <View ref={ref} onLayout={measure} style={[{ flex: 1, ...padX(padLeft, padRight) }, style]}>
         {children}
       </View>
     </RailInsetContext.Provider>
