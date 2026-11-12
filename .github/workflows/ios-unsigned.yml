@@ -3,8 +3,9 @@ on:
   workflow_dispatch:
 jobs:
   build:
-    # Newest macOS image; the step below picks the newest Xcode on it (iPhone Duo needs the iOS 27.1 SDK).
-    runs-on: macos-latest
+    # iPhone Duo needs the iOS 27.1 SDK, which only GitHub's Xcode 27 image has. Do not change this to
+    # macos-latest: that image has Xcode 26, and the Duo then runs the app in compatibility mode (black bar).
+    runs-on: xcode-27
     timeout-minutes: 60
     env:
       WRK_SIDELOAD: "1"
@@ -18,10 +19,17 @@ jobs:
       - name: Select the newest Xcode 27
         run: |
           ls -d /Applications/Xcode*
-          X=$(ls -d /Applications/Xcode_*.app 2>/dev/null | grep -v beta | sort -V | tail -1)
+          X=$(ls -d /Applications/Xcode_27*.app 2>/dev/null | sort -V | tail -1)
           if [ -n "$X" ]; then sudo xcode-select -s "$X/Contents/Developer"; fi
           xcodebuild -version
           xcodebuild -showsdks | grep -i iphoneos
+          # Stop here rather than ship a build the iPhone Duo shows in compatibility mode.
+          SDK=$(xcrun --sdk iphoneos --show-sdk-version)
+          echo "iphoneos SDK $SDK"
+          if [ "$(printf '%s\n27.1\n' "$SDK" | sort -V | head -1)" != "27.1" ]; then
+            echo "::error::iOS SDK $SDK is older than 27.1: the iPhone Duo would run this build in compatibility mode."
+            exit 1
+          fi
       - name: Write .env from secrets
         env:
           SHOP_API_URL: ${{ secrets.EXPO_PUBLIC_SHOP_API_URL }}
